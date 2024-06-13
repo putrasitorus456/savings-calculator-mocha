@@ -1,24 +1,22 @@
 import { expect } from 'chai';
 import calculateMonthsToSave from '../src/savingsCalculator.js';
+import fs from 'fs';
+import path from 'path';
+
+const __dirname = path.resolve();
+const testDataPath = path.join(__dirname, 'tests', 'testData.json');
+const testData = JSON.parse(fs.readFileSync(testDataPath, 'utf8'));
+
+testData.forEach(data => {
+  if (data.expected === "Infinity") {
+    data.expected = Infinity;
+  }
+});
 
 describe('Savings Calculator', () => {
-  it('should calculate months to save with initialAmount less than targetAmount', () => {
-    expect(calculateMonthsToSave(100, 50, 200)).to.equal(2);
-  });
-
-  it('should calculate months to save with initialAmount equal to targetAmount', () => {
-    expect(calculateMonthsToSave(200, 50, 200)).to.equal(0);
-  });
-
-  it('should calculate months to save with initialAmount greater than targetAmount', () => {
-    expect(calculateMonthsToSave(300, 50, 200)).to.equal(0);
-  });
-
-  it('should calculate months to save with zero monthly savings', () => {
-    expect(calculateMonthsToSave(100, 0, 200)).to.equal(Infinity);
-  });
-
-  it('should calculate months to save with target already reached', () => {
-    expect(calculateMonthsToSave(500, 50, 200)).to.equal(0);
+  testData.forEach(({ initialAmount, monthlySavings, targetAmount, expected }) => {
+    it(`need ${expected} months to save with initialAmount ${initialAmount}, monthlySavings ${monthlySavings}, targetAmount ${targetAmount}`, () => {
+      expect(calculateMonthsToSave(initialAmount, monthlySavings, targetAmount)).to.equal(expected);
+    });
   });
 });
